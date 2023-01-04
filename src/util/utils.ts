@@ -7,7 +7,6 @@ import {
     HttpConnection,
 } from 'thrift';
 
-const port: number = 80;
 const cookies: object = {
     'device_name': 'iPhone10.3',
     'device_version': '13.4.1',
@@ -35,12 +34,14 @@ export function createClient<TClient>(url: string, client: TClientConstructor<TC
             'User-Agent': 'Cocoa/THTTPClient bcz_app_iphone/7020300',
             'Accept-Language': 'zh-cn',
             'Cookie': cookieStr,
-            'Host': 'resource.baicizhan.com',
+            'Host': host,
         }
     };
 
-    const conn: HttpConnection = createHttpConnection(host, port, options);
+    const conn: HttpConnection = createHttpConnection('resource.baicizhan.com', 80, options);
 
+    // thrift 生成的 ts 定义、js 代码是错误的
+    // 使用 thrift --gen js:node 生成的 js 代码和手动调整的 ts 定义
     return createHttpClient(client, conn);
 }
 
@@ -59,7 +60,7 @@ export function getPathVariables(req: Request, path: string): object {
     let pattern: RegExp = new RegExp(path.replace(pathPattern, '([^/]+)'), 'g');
 
     while ((match = pattern.exec(url)) != null) {
-        values.push(match[1]);
+        values.push(...match.slice(1));
     }
 
     let result: object = {};

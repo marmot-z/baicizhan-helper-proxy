@@ -1,30 +1,55 @@
-import { createHttpConnection, createHttpClient, TFramedTransport, TCompactProtocol, HttpConnection } from 'thrift';
+import { createClient, getPathVariables } from '../util/utils';
 import { Client } from '../bin/UnifiedUserService';
+import { PhoneFreeVerifyRequest, PhoneLoginRequest, PhoneVerifyCodeRequest, UserBindInfo, UserLoginResult } from '../bin/baicizhan_types';
 
 export default class LoginController {
-    public sendSmsVerifyCode(req: Request): boolean {
-        const path: string = `/rpc/resource_api/search_word_v2/${new Date().getTime()}`;
-        const options: object = {
-            path,
-            https: false,
-            transport: TFramedTransport,
-            protocol: TCompactProtocol,
-            headers: {
-                'User-Agent': 'Cocoa/THTTPClient bcz_app_iphone/7020300',
-                'Accept-Language': 'zh-cn',
-                'Cookie': 'device_name=iPhone10.3; device_version=13.4.1; device_id=450E525F-B0BE-4194-A5BD-DFDF9DC11661; app_name=7020300; serial=450E525F-B07165133; access_token=/MVQkLcaoe7Fbhoh8r4ybHdFnQiNUSSCFuR5xkBSbcw%3D; os_version=13.4.1; app_version=7020300; channel=appstore; client_time=1659862293',
-                'Host': 'resource.baicizhan.com',
-            }
-        };
-        const conn: HttpConnection = createHttpConnection("resource.baicizhan.com", 80, options);
-        const client: Client = createHttpClient(Client, conn);
+    public sendSmsVerifyCode(req: Request): Promise<boolean> {
+        const path: string = 'https://passport.baicizhan.com/rpc/unified_user_service/send_sms_verify_code';
+        const client: Client = createClient(path, Client);
+        const phoneNum: string = getPathVariables(req, '/login/sendSmsVerifyCode/{phoneNum}')['phoneNum'];
+        const verifyType: number = 5;
 
-        client.send_sms_verify_code('15870664270', 5, (err, data) => {
-            if (err) throw err;
-
-            console.log(data);
+        return new Promise((resolve, reject) => {
+            client.send_sms_verify_code(phoneNum, verifyType, (err, data) => {
+                return err ? reject(err) : resolve(true);
+            });
         });
+    }
 
-        return false;
+    public loginWithPhoneNum(req: Request): Promise<UserLoginResult> {
+        const path: string = 'https://passport.baicizhan.com/rpc/unified_user_service/login_with_phone';
+        const client: Client = createClient(path, Client);
+        const pathVariables: object = getPathVariables(req, '/login/{phoneNum}/{verifyCode}');
+        const phoneNum: string = pathVariables['phoneNum'];
+        const verifyCode: string = pathVariables['verifyCode'];
+
+        return new Promise((resolve, reject) => {
+            const loginRequest: PhoneLoginRequest = new PhoneLoginRequest({            
+                'verify_code_request': new PhoneVerifyCodeRequest({phone: phoneNum, verify_code: verifyCode}),
+                'free_verify_request': new PhoneFreeVerifyRequest({ clientToken: '', opToken: '', operatorName: ''}),
+                'device': req.headers['device_id'] || ''
+            });
+
+            client.login_with_phone(loginRequest, (err, data) => {
+                return err ? reject(err) : resolve(data);
+            });
+        });
+    }
+
+    public getUserInfo(req: Request): Promise<UserBindInfo[]> {
+        const path: string = 'https://passport.baicizhan.com/rpc/unified_user_service/check_access_token';
+        const accessToken: string = req.headers['access_token'];        
+        const client: Client = createClient(path, Client, accessToken);
+        const deviceId: string = req.headers['device_id'] || '';
+        
+        return new Promise((resolve, reject) => {
+            client.check_access_token(deviceId, (err, _) => {
+                if (err) return reject(err);
+
+                client.get_bind_info((error, data) => {
+                    return error ? reject(error) : resolve(data);
+                });
+            });
+        });
     }
 }

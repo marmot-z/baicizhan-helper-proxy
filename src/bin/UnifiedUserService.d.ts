@@ -22,13 +22,13 @@ export declare class Client {
 
   login_with_phone(request: PhoneLoginRequest): UserLoginResult;
 
-  login_with_phone(request: PhoneLoginRequest, callback?: (data: UserLoginResult)=>void): void;
+  login_with_phone(request: PhoneLoginRequest, callback?: (err: Error | undefined, data: UserLoginResult)=>void): void;
 
   check_access_token(device: string): AccessTokenCheckResult;
 
-  check_access_token(device: string, callback?: (data: AccessTokenCheckResult)=>void): void;
+  check_access_token(device: string, callback?: (err: Error | undefined, data: AccessTokenCheckResult)=>void): void;
 
   get_bind_info(): UserBindInfo[];
 
-  get_bind_info(callback?: (data: UserBindInfo[])=>void): void;
+  get_bind_info(callback?: (err: Error | undefined, data: UserBindInfo[])=>void): void;
 }

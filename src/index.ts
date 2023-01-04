@@ -5,6 +5,7 @@ import LoginController from './controller/login-controller';
 import ResourceController from './controller/resource-controller';
 import ResponseResult from './entity/response-result';
 import BookController from './controller/book-controller';
+import Int64 from 'node-int64';
 
 const host: string = '127.0.0.1';
 const port: number = 8080;
@@ -16,10 +17,14 @@ function registRouter(): void {
     let resourceController: ResourceController = new ResourceController();
     let bookController: BookController = new BookController();
 
-    // globalRouters.set(/login\/sendSmsVerifyCode\/\d{11}/, post(loginController.sendSmsVerifyCode));
-    globalRouters.set(/search\/word\/\w+/, get(resourceController.searchWord));
-    globalRouters.set(/word\/\w+/, get(resourceController.getWordDetail));
-    globalRouters.set(/books/, get(bookController.getBookList));
+    globalRouters.set(/^\/login\/sendSmsVerifyCode\/\d{11}/, post(loginController.sendSmsVerifyCode));
+    globalRouters.set(/^\/login\/\w+\/\d{6}/, post(loginController.loginWithPhoneNum));
+    globalRouters.set(/^\/userInfo/, get(loginController.getUserInfo));
+    globalRouters.set(/^\/search\/word\/\w+/, get(resourceController.searchWord));
+    globalRouters.set(/^\/word\/\w+/, get(resourceController.getWordDetail));
+    globalRouters.set(/^\/books/, get(bookController.getBookList));
+    globalRouters.set(/^\/book\/\d+\/word\/\d+/, _delete(bookController.removeWord));
+    globalRouters.set(/^\/book\/\d+\/word\/\w+/, put(bookController.addWord));    
 }
 
 registRouter();
@@ -58,8 +63,15 @@ http.createServer((req, resp) => {
 );
 
 function sendResponse(resp: ServerResponse, result: any): void {
-    resp.writeHead(200, {'Content-type': 'application/json; charset=utf-8'});    
-    resp.write(JSON.stringify(ResponseResult.successful(result)));
+    resp.writeHead(200, {'Content-type': 'application/json; charset=utf-8'});
+    let json: string = JSON.stringify(ResponseResult.successful(result), (k, v) => {
+        if (v instanceof Int64) {
+            return (v as Int64).toNumber();
+        }
+
+        return v;
+    });
+    resp.write(json);
     resp.end();
 }
 
