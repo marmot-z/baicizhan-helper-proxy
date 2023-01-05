@@ -1,6 +1,6 @@
 import { createClient, getPathVariables } from '../util/utils';
-import { Client } from '../bin/UnifiedUserService';
-import { PhoneFreeVerifyRequest, PhoneLoginRequest, PhoneVerifyCodeRequest, UserBindInfo, UserLoginResult } from '../bin/baicizhan_types';
+import { Client } from '../gen/UnifiedUserService';
+import { PhoneFreeVerifyRequest, PhoneLoginRequest, PhoneVerifyCodeRequest, UserBindInfo, UserLoginResult } from '../gen/baicizhan_types';
 
 export default class LoginController {
     public sendSmsVerifyCode(req: Request): Promise<boolean> {

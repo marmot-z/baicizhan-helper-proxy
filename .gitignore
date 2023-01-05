@@ -1,5 +1,5 @@
 node_modules
 dist
 .vscode
-src/bin/baicizhan_types.d.ts
-src/bin/baicizhan_types.js
+baicizhan_types.d.ts
+baicizhan_types.js

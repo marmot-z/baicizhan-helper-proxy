@@ -1,6 +1,6 @@
-import { UserBookInfo, AddWordsRsp, UserBookWord } from "../bin/baicizhan_types";
+import { UserBookInfo, AddWordsRsp, UserBookWord } from "../gen/baicizhan_types";
 import { createClient, getPathVariables } from "../util/utils";
-import { Client } from "../bin/UserBookService";
+import { Client } from "../gen/UserBookService";
 import Int64 from "node-int64";
 
 export default class BookController {

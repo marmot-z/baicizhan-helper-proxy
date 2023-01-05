@@ -1,6 +1,6 @@
 import { createClient, getPathVariables } from '../util/utils';
-import { SearchWordResultV2, TopicResourceV2, TopicKey, GetTopicResourceChannel } from '../bin/baicizhan_types';
-import { Client } from '../bin/ResourceService';
+import { SearchWordResultV2, TopicResourceV2, TopicKey, GetTopicResourceChannel } from '../gen/baicizhan_types';
+import { Client } from '../gen/ResourceService';
 
 export default class ResourceController {
     public searchWord(req: Request): Promise<SearchWordResultV2[]> {
