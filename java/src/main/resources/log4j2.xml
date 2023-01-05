@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" packages="org.apache.logging.log4j.core,io.sentry.log4j2,cn.dxy.open.admin.log">
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{[%d{yyyy-MM-dd HH:mm:sss}][%level][%logger{36}]-%m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=cyan,TRACE=blue}"/>
+        </Console>
+        <Sentry name="Sentry" />
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

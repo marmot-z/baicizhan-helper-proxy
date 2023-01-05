@@ -3,3 +3,6 @@ dist
 .vscode
 baicizhan_types.d.ts
 baicizhan_types.js
+java/src/main/resources/thrift/
+java/src/main/java/com/zxw/baicizhanhelper/entity/
+!java/src/main/java/com/zxw/baicizhanhelper/entity/Response.java
